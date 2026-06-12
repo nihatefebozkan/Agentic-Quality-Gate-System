@@ -7,6 +7,7 @@ Kullanıcıya cevap ulaşmadan önce arka planda kalite kontrolü yapan, test ag
 ## Neden Bu Proje?
 
 Mevcut AI sistemleri test edilmeden cevap veriyor. Kullanıcı istediği cevabı alamıyor ve tekrar sormak zorunda kalıyor. Bu sistem o problemi arka planda çözüyor — kullanıcı görmüyor ama deneyimi çok daha iyi oluyor.
+Bu sistem yapay zekanın problemi olan Hallucination, Bağlam kaybı, Genel Kalıplarla cevap verme gibi problemlerinin önüne geçerek cevap verirken doğruluğu arttırarak yapay zeka kullanımında uzun vadede token tasarrufu sağlayacağı öngörülüyor.
 
 Sektördeki karşılığı: **LLM as a Judge** + **Agentic Quality Gate**
 
