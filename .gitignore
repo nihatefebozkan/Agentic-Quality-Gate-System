@@ -1,0 +1,14 @@
+# Ortam değişkenleri / sırlar — ASLA push etme
+.env
+
+# Python sanal ortamı
+venv/
+__pycache__/
+*.pyc
+
+# Konuşma kayıtları (kişisel veri olabilir)
+kayitlar/
+
+# Editör / OS
+.DS_Store
+.vscode/

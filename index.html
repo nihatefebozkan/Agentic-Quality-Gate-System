@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kariyer Danışmanı · Quality Gate</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a; color: #e2e8f0; height: 100vh; display: flex;
+    }
+    .panel { display: flex; flex-direction: column; height: 100vh; }
+    .chat { flex: 1.3; border-right: 1px solid #1e293b; }
+    .gate { flex: 1; background: #0b1220; min-width: 380px; }
+    .baslik {
+      padding: 14px 20px; font-weight: 600; font-size: 15px;
+      border-bottom: 1px solid #1e293b; display: flex; align-items: center;
+      justify-content: space-between; gap: 8px;
+    }
+    .gate .baslik { color: #fbbf24; }
+    .durum-rozet { font-size: 11px; font-weight: 700; padding: 4px 10px;
+                   border-radius: 999px; text-transform: uppercase;
+                   letter-spacing: .5px; background: #1e293b; color: #64748b; }
+    .durum-rozet.basari { background: #052e1a; color: #22c55e; }
+    .durum-rozet.kismi_basari { background: #3a2e08; color: #fbbf24; }
+    .durum-rozet.basarisiz { background: #3a0d0d; color: #ef4444; }
+    .akis { flex: 1; overflow-y: auto; padding: 20px; display: flex;
+            flex-direction: column; gap: 14px; }
+    .mesaj { max-width: 82%; padding: 12px 16px; border-radius: 14px;
+             line-height: 1.5; font-size: 14px; white-space: pre-wrap; }
+    .mesaj.kullanici { align-self: flex-end; background: #2563eb; color: #fff;
+                       border-bottom-right-radius: 4px; }
+    .mesaj.agent { align-self: flex-start; background: #1e293b;
+                   border-bottom-left-radius: 4px; }
+    .mesaj.dusunuyor { align-self: flex-start; background: #1e293b;
+                       color: #94a3b8; font-style: italic; }
+    .girdi { display: flex; gap: 10px; padding: 16px 20px;
+             border-top: 1px solid #1e293b; }
+    .girdi input {
+      flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid #334155;
+      background: #1e293b; color: #e2e8f0; font-size: 14px; outline: none;
+    }
+    .girdi input:focus { border-color: #2563eb; }
+    .girdi button {
+      padding: 12px 18px; border: none; border-radius: 10px; background: #2563eb;
+      color: #fff; font-weight: 600; cursor: pointer; font-size: 14px;
+    }
+    .girdi button.ikincil { background: #334155; }
+    .girdi button:disabled { background: #334155; cursor: not-allowed; opacity: .6; }
+    .log { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex;
+           flex-direction: column; gap: 14px; }
+    .blok { border-left: 2px solid #1e293b; padding-left: 12px; }
+    .blok-ust { display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+                flex-wrap: wrap; }
+    .blok-no { font-size: 12px; font-weight: 700; color: #94a3b8; }
+    .tip { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+           text-transform: uppercase; letter-spacing: .5px; }
+    .tip.kariyer { background: #0c2a4d; color: #60a5fa; }
+    .tip.sohbet { background: #2a1a3a; color: #c084fc; }
+    .tur-kart { background: #111c33; border: 1px solid #1e293b; border-radius: 10px;
+                padding: 12px; margin-bottom: 8px; }
+    .tur-ust { display: flex; justify-content: space-between; align-items: center;
+               margin-bottom: 8px; }
+    .tur-etiket { font-size: 11px; font-weight: 600; color: #94a3b8;
+                  text-transform: uppercase; letter-spacing: .5px; }
+    .skor { font-size: 20px; font-weight: 700; }
+    .skor.iyi { color: #22c55e; } .skor.orta { color: #fbbf24; }
+    .skor.kotu { color: #ef4444; }
+    .bar { height: 6px; border-radius: 4px; background: #1e293b;
+           overflow: hidden; margin-bottom: 10px; }
+    .bar > div { height: 100%; transition: width .4s; }
+    .alt-baslik { font-size: 10px; color: #64748b; text-transform: uppercase;
+                  margin: 8px 0 4px; letter-spacing: .5px; }
+    .liste { list-style: none; font-size: 13px; line-height: 1.45; }
+    .liste li { padding-left: 14px; position: relative; margin-bottom: 3px; }
+    .liste li::before { content: "•"; position: absolute; left: 0; color: #475569; }
+    .neden li::before { color: #ef4444; }
+    .yapilacak li::before { color: #38bdf8; }
+    .mesaj-durum { font-size: 12px; margin-top: 6px; padding: 7px 10px;
+                   border-radius: 8px; background: #111c33; }
+    .sohbet-not { font-size: 13px; color: #c084fc; background: #1a1228;
+                  border: 1px solid #2a1a3a; border-radius: 10px; padding: 12px;
+                  line-height: 1.45; }
+    .bos { color: #475569; font-size: 13px; padding: 20px; text-align: center; }
+  </style>
+</head>
+<body>
+  <!-- SOL: Chat -->
+  <div class="panel chat">
+    <div class="baslik">🎯 Kariyer Danışmanı</div>
+    <div class="akis" id="akis">
+      <div class="mesaj agent">Merhaba! Hedef pozisyonun, deneyimin, bütçen ve
+nerede çalışmak istediğin hakkında bana yazabilirsin. Sohbet de edebilirsin —
+sağdaki panelde her mesajın nasıl sınıflandığını ve puanlandığını görürsün.</div>
+    </div>
+    <div class="girdi">
+      <input id="girdi" type="text" placeholder="Mesajını yaz..." autocomplete="off">
+      <button id="gonder">Gönder</button>
+      <button id="sifirla" class="ikincil" title="Yeni konuşma">⟳</button>
+    </div>
+  </div>
+
+  <!-- SAĞ: Quality Gate -->
+  <div class="panel gate">
+    <div class="baslik">
+      <span>🛡️ Quality Gate · Log</span>
+      <span class="durum-rozet" id="genelDurum">—</span>
+    </div>
+    <div class="log" id="log">
+      <div class="bos">Henüz değerlendirme yok. Bir mesaj gönder.</div>
+    </div>
+  </div>
+
+  <script>
+    // Dosyadan (file://) açıldıysa istekleri yerel sunucuya yönlendir.
+    const API = location.protocol === "file:" ? "http://127.0.0.1:5000" : "";
+
+    const akis = document.getElementById("akis");
+    const log = document.getElementById("log");
+    const girdi = document.getElementById("girdi");
+    const gonder = document.getElementById("gonder");
+    const sifirla = document.getElementById("sifirla");
+    const genelDurum = document.getElementById("genelDurum");
+
+    function mesajEkle(metin, sinif) {
+      const d = document.createElement("div");
+      d.className = "mesaj " + sinif;
+      d.textContent = metin;
+      akis.appendChild(d);
+      akis.scrollTop = akis.scrollHeight;
+      return d;
+    }
+
+    const skorSinif = s => s >= 80 ? "iyi" : s >= 50 ? "orta" : "kotu";
+    const skorRenk = s => s >= 80 ? "#22c55e" : s >= 50 ? "#fbbf24" : "#ef4444";
+    const liItems = a => (a || []).map(o => `<li>${o}</li>`).join("");
+
+    function turKartHTML(t) {
+      const s = t.skor ?? 0;
+      const gb = t.geri_bildirim || {};
+      const neden = liItems(gb.neden_dusuk);
+      const yap = liItems(gb.yapilmasi_gerekenler);
+      return `
+        <div class="tur-kart">
+          <div class="tur-ust">
+            <span class="tur-etiket">${t.etiket}</span>
+            <span class="skor ${skorSinif(s)}">${s}<span style="font-size:12px">/100</span></span>
+          </div>
+          <div class="bar"><div style="width:${s}%;background:${skorRenk(s)}"></div></div>
+          ${neden ? `<div class="alt-baslik">Düşük puan nedenleri</div>
+                     <ul class="liste neden">${neden}</ul>` : ""}
+          ${yap ? `<div class="alt-baslik">Yapılması gerekenler</div>
+                   <ul class="liste yapilacak">${yap}</ul>` : ""}
+        </div>`;
+    }
+
+    function durumRozet(durum) {
+      genelDurum.className = "durum-rozet " + (durum || "");
+      genelDurum.textContent = durum ? durum.replace("_", " ") : "—";
+    }
+
+    function blokEkle(data) {
+      const ayrac = document.querySelector("#log .bos");
+      if (ayrac) ayrac.remove();
+
+      const blok = document.createElement("div");
+      blok.className = "blok";
+      let ic = `<div class="blok-ust">
+                  <span class="blok-no">Mesaj ${data.mesaj_no}</span>
+                  <span class="tip ${data.tip}">${data.tip}</span>
+                </div>`;
+
+      if (data.tip === "sohbet") {
+        ic += `<div class="sohbet-not">💬 Sohbet olarak algılandı.
+               Kalite kapısı atlandı, skorlama yapılmadı.</div>`;
+      } else {
+        ic += data.turlar.map(turKartHTML).join("");
+        const md = data.mesaj_durumu || {};
+        ic += `<div class="mesaj-durum">Mesaj durumu:
+               <b style="color:${skorRenk(md.skor ?? 0)}">${md.durum ?? "?"}</b>
+               (en iyi skor: ${md.skor ?? "?"})</div>`;
+      }
+      blok.innerHTML = ic;
+      log.appendChild(blok);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function gonderMesaj() {
+      const mesaj = girdi.value.trim();
+      if (!mesaj) return;
+      girdi.value = "";
+      gonder.disabled = true; girdi.disabled = true;
+      mesajEkle(mesaj, "kullanici");
+      const dusunuyor = mesajEkle("düşünüyor...", "dusunuyor");
+
+      try {
+        const r = await fetch(API + "/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mesaj })
+        });
+        const data = await r.json();
+        dusunuyor.remove();
+        if (data.hata) { mesajEkle("⚠️ " + data.hata, "agent"); return; }
+
+        blokEkle(data);
+        durumRozet(data.sonuc_durumu);
+        mesajEkle(data.cevap, "agent");
+      } catch (e) {
+        dusunuyor.remove();
+        mesajEkle("⚠️ Bağlantı hatası: " + e.message, "agent");
+      } finally {
+        gonder.disabled = false; girdi.disabled = false; girdi.focus();
+      }
+    }
+
+    async function sifirlaKonusma() {
+      await fetch(API + "/api/reset", { method: "POST" });
+      akis.querySelectorAll(".mesaj:not(:first-child)").forEach(m => m.remove());
+      log.innerHTML = '<div class="bos">Henüz değerlendirme yok. Bir mesaj gönder.</div>';
+      durumRozet(null);
+      girdi.focus();
+    }
+
+    gonder.addEventListener("click", gonderMesaj);
+    sifirla.addEventListener("click", sifirlaKonusma);
+    girdi.addEventListener("keydown", e => { if (e.key === "Enter") gonderMesaj(); });
+    girdi.focus();
+  </script>
+</body>
+</html>
