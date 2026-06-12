@@ -173,38 +173,6 @@ Test sırasında fault injection (çalışma anında MAKS_DUZELTME=0 override) v
 - [ ] Farklı model judge — self-preference bias'ı azaltmak için
 - [ ] Farklı agent tipleri için genişletme
 
----
-
-## Kurulum
-
-```bash
-git clone https://github.com/nihatefebozkan/agentic-quality-gate.git
-cd agentic-quality-gate
-pip install groq python-dotenv flask
-```
-
-`.env` dosyası oluştur:
-```
-GROQ_API_KEY=your_api_key_here
-```
-
-Terminal arayüzü (CLI):
-```bash
-python career_advisor.py
-```
-
-Test agent'ını tek başına çalıştırma (örnek veriyle):
-```bash
-python test_agent.py
-```
-
-Web arayüzü:
-```bash
-python app.py
-```
-Sonra tarayıcıda `http://localhost:5000` adresini aç.
-
----
 
 ## Proje Durumu
 
